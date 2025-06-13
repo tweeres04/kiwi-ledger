@@ -1,0 +1,14 @@
+services:
+  kiwi-ledger:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    restart: always
+    env_file: ".env"
+    volumes:
+      - ./${SERVICE_ACCOUNT_KEY_PATH}:/app/${SERVICE_ACCOUNT_KEY_PATH}
+
+networks:
+  default:
+    external: true
+    name: proxy
