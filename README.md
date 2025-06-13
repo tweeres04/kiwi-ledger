@@ -1,4 +1,8 @@
-# Welcome to React Router!
+# Kiwi Ledger
+
+A simple ledger to track household expenses
+
+## Built with React Router
 
 A modern, production-ready template for building full-stack React applications using React Router.
 
