@@ -41,7 +41,7 @@ const LedgerEntrySchema = z.object({
   Notes: z.string().optional(),
 });
 
-type LedgerEntry = z.infer<typeof LedgerEntrySchema>;
+export type LedgerEntry = z.infer<typeof LedgerEntrySchema>;
 
 async function getAuthClient(): Promise<Auth.GoogleAuth> {
   if (!fs.existsSync(SERVICE_ACCOUNT_KEY_PATH)) {
