@@ -75,9 +75,7 @@ export function LedgerPage() {
                     }).format(total)}
                   </td>
                   <td className="text-right">
-                    {total > 0
-                      ? `${((total / totalAmount) * 100).toFixed(2)}%`
-                      : "0%"}
+                    {((total / totalAmount) * 100).toFixed(0)}%
                   </td>
                 </tr>
               ))}
