@@ -4,6 +4,7 @@ import {
   Form,
   useNavigation,
   useActionData,
+  useRevalidator,
 } from "react-router";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
@@ -79,6 +80,7 @@ export function LedgerPage() {
   const { ledgerData, error } = useLoaderData() as LedgerLoaderData;
   const navigation = useNavigation();
   const actionData = useActionData();
+  const revalidator = useRevalidator();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -86,6 +88,19 @@ export function LedgerPage() {
       setIsDialogOpen(false);
     }
   }, [actionData]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        revalidator.revalidate();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [revalidator]);
 
   const totals = ledgerData.reduce<Record<string, number>>(
     (acc, entry) => {
