@@ -185,7 +185,7 @@ export function LedgerPage() {
         <DialogTrigger asChild>
           <Button
             size="icon"
-            className="size-16 fixed bottom-3 rounded-full shadow-2xl"
+            className="size-16 fixed bottom-20 rounded-full shadow-2xl"
             style={{
               right:
                 "max(calc(var(--spacing) * 3), calc(50% - 300px + calc(var(--spacing) * 3)))",
