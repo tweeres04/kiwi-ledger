@@ -218,6 +218,7 @@ export function LedgerPage() {
                   name="amount"
                   required
                   placeholder="$0.00"
+                  inputMode="decimal"
                 />
               </div>
               <div>
