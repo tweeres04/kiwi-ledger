@@ -127,7 +127,7 @@ export function LedgerPage() {
     <div className="max-w-[600px] mx-auto px-2 py-5 space-y-10 relative">
       {ledgerData && ledgerData.length > 0 ? (
         <>
-          <h1 className="text-xl">Kiwi Ledger</h1>
+          <h1 className="text-xl">🥝 Kiwi Ledger</h1>
           <table className="w-full sm:w-auto">
             <thead>
               <tr>
