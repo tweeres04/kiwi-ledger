@@ -1,9 +1,35 @@
 import { format } from "date-fns";
-import { useLoaderData } from "react-router";
 import {
+  useLoaderData,
+  Form,
+  useNavigation,
+  useActionData,
+} from "react-router";
+import { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
+import {
+  addLedgerEntry,
   getLedgerData,
   type LedgerEntry,
 } from "~/services/googleSheetsService";
+import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 interface LedgerLoaderData {
   ledgerData: LedgerEntry[];
@@ -23,6 +49,26 @@ export async function loader() {
   }
 }
 
+export async function action({ request }: { request: Request }) {
+  const formData = await request.formData();
+  const date = formData.get("date") as string;
+  const amount = formData.get("amount") as string;
+  const who = formData.get("who") as string;
+  const notes = formData.get("notes") as string;
+
+  try {
+    // Format date to match the format used in Google Sheets ("d MMM yyyy")
+    const dateObj = new Date(date);
+    const formattedDate = format(dateObj, "d MMM yyyy");
+
+    await addLedgerEntry(formattedDate, amount, who, notes);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error adding ledger entry:", error);
+    return { error: error.message ?? "Failed to add ledger entry." };
+  }
+}
+
 const people = ["Tyler", "Melissa"];
 
 function formattedAmountToNumber(amount: string): number {
@@ -31,6 +77,15 @@ function formattedAmountToNumber(amount: string): number {
 
 export function LedgerPage() {
   const { ledgerData, error } = useLoaderData() as LedgerLoaderData;
+  const navigation = useNavigation();
+  const actionData = useActionData();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (actionData?.success) {
+      setIsDialogOpen(false);
+    }
+  }, [actionData]);
 
   const totals = ledgerData.reduce<Record<string, number>>(
     (acc, entry) => {
@@ -51,8 +106,10 @@ export function LedgerPage() {
     0
   );
 
+  const isSubmitting = navigation.state === "submitting";
+
   return (
-    <div className="max-w-[600px] mx-auto px-2 py-5 space-y-10">
+    <div className="max-w-[600px] mx-auto px-2 py-5 space-y-10 relative">
       {ledgerData && ledgerData.length > 0 ? (
         <>
           <h1 className="text-xl">Kiwi Ledger</h1>
@@ -108,6 +165,79 @@ export function LedgerPage() {
         <p>No ledger data found.</p>
       )}
       {error && <p>An unexpected error occurred: {error}</p>}
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            size="icon"
+            className="size-16 fixed bottom-3 rounded-full shadow-2xl"
+            style={{
+              right:
+                "max(calc(var(--spacing) * 3), calc(50% - 300px + calc(var(--spacing) * 3)))",
+            }}
+          >
+            <Plus className="size-6" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Entry</DialogTitle>
+          </DialogHeader>
+          <Form method="post">
+            <div className="space-y-4 [&>div]:space-y-2">
+              <div>
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  type="date"
+                  id="date"
+                  name="date"
+                  required
+                  defaultValue={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+              <div>
+                <Label htmlFor="amount">Amount</Label>
+                <Input
+                  type="text"
+                  id="amount"
+                  name="amount"
+                  required
+                  placeholder="$0.00"
+                />
+              </div>
+              <div>
+                <Label>Who</Label>
+                <Select name="who" required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select person" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {people.map((person) => (
+                      <SelectItem key={person} value={person}>
+                        {person}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="notes">Notes</Label>
+                <Input
+                  type="text"
+                  id="notes"
+                  name="notes"
+                  placeholder="Add notes here"
+                />
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Adding..." : "Add Entry"}
+              </Button>
+            </DialogFooter>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

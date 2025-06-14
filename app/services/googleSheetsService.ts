@@ -51,7 +51,7 @@ async function getAuthClient(): Promise<Auth.GoogleAuth> {
   }
   const auth = new google.auth.GoogleAuth({
     keyFile: SERVICE_ACCOUNT_KEY_PATH,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"], // Changed from .readonly
   });
   return auth;
 }
@@ -103,6 +103,38 @@ export async function getLedgerData(): Promise<LedgerEntry[]> {
   } catch (error: any) {
     console.error("Error fetching data from Google Sheets:", error);
     let errorMessage = "Failed to fetch data from Google Sheets. ";
+    if (error.response && error.response.data && error.response.data.error) {
+      errorMessage += `Google API Error: ${error.response.data.error.message}`;
+    } else if (error.message) {
+      errorMessage += error.message;
+    }
+    throw new Error(errorMessage);
+  }
+}
+
+export async function addLedgerEntry(
+  date: string,
+  amount: string,
+  who: string,
+  notes?: string
+): Promise<void> {
+  try {
+    const authClient = await getAuthClient();
+    const sheets = google.sheets({ version: "v4", auth: authClient });
+
+    const values = [[date, amount, who, notes || ""]];
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID,
+      range: RANGE,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: values,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error adding data to Google Sheets:", error);
+    let errorMessage = "Failed to add data to Google Sheets. ";
     if (error.response && error.response.data && error.response.data.error) {
       errorMessage += `Google API Error: ${error.response.data.error.message}`;
     } else if (error.message) {
