@@ -25,6 +25,9 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap",
   },
+  { rel: "icon", href: "/kiwi-ledger.png", type: "image/png" },
+  { rel: "apple-touch-icon", href: "/kiwi-ledger.png" },
+  { rel: "manifest", href: "/manifest.json" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -33,6 +36,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="description"
+          content="A simple ledger app for tracking expenses"
+        />
+        <meta name="theme-color" content="#5CB85C" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Kiwi Ledger" />
         <Meta />
         <Links />
       </head>
