@@ -182,6 +182,15 @@ export function LedgerPage() {
               </tbody>
             </table>
           </div>
+          <div className="text-right">
+            <h2 className="text-lg font-semibold">Total Paid</h2>
+            <p className="text-2xl font-bold">
+              {Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(totalAmount)}
+            </p>
+          </div>
         </>
       ) : (
         <p>No ledger data found.</p>
