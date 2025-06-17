@@ -82,6 +82,8 @@ export function LedgerPage() {
   const actionData = useActionData();
   const revalidator = useRevalidator();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<LedgerEntry | null>(null);
+  const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
 
   useEffect(() => {
     if (actionData?.success) {
@@ -122,6 +124,21 @@ export function LedgerPage() {
   );
 
   const isSubmitting = navigation.state === "submitting";
+
+  const handleRowClick = (entry: LedgerEntry) => {
+    setSelectedEntry(entry);
+    setIsSplitDialogOpen(true);
+  };
+
+  const getOneThirdAmount = (amount: string) => {
+    const numericAmount = formattedAmountToNumber(amount);
+    return numericAmount / 3;
+  };
+
+  const getTwoThirdsAmount = (amount: string) => {
+    const numericAmount = formattedAmountToNumber(amount);
+    return (numericAmount * 2) / 3;
+  };
 
   return (
     <div className="max-w-[600px] mx-auto px-2 py-5 space-y-10 relative">
@@ -177,7 +194,11 @@ export function LedgerPage() {
                       new Date(b.Date).getTime() - new Date(a.Date).getTime()
                   )
                   .map((entry, index) => (
-                    <tr key={index}>
+                    <tr
+                      key={index}
+                      onClick={() => handleRowClick(entry)}
+                      className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    >
                       <td>{format(entry.Date, "d MMM yyyy")}</td>
                       <td>{entry.Notes}</td>
                       <td>{entry.Who}</td>
@@ -273,6 +294,55 @@ export function LedgerPage() {
               </Button>
             </DialogFooter>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isSplitDialogOpen} onOpenChange={setIsSplitDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Entry info</DialogTitle>
+          </DialogHeader>
+          {selectedEntry && (
+            <div className="space-y-5">
+              <div>
+                {selectedEntry.Notes ? (
+                  <p>
+                    <strong>Entry:</strong> {selectedEntry.Notes}
+                  </p>
+                ) : null}
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {format(selectedEntry.Date, "d MMM yyyy")}
+                </p>
+                <p>
+                  <strong>Who:</strong> {selectedEntry.Who}
+                </p>
+                <p>
+                  <strong>Amount:</strong> {selectedEntry.Amount}
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold">
+                  One third:{" "}
+                  <span className="text-green-600">
+                    {Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(getOneThirdAmount(selectedEntry.Amount))}
+                  </span>
+                </p>
+                <p className="font-semibold">
+                  Two thirds:{" "}
+                  <span className="text-green-600">
+                    {Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(getTwoThirdsAmount(selectedEntry.Amount))}
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
