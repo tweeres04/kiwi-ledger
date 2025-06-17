@@ -5,6 +5,8 @@ services:
       context: .
     restart: always
     env_file: ".env"
+    environment:
+      - TZ=America/Vancouver
     volumes:
       - ./${SERVICE_ACCOUNT_KEY_PATH}:/app/${SERVICE_ACCOUNT_KEY_PATH}
 

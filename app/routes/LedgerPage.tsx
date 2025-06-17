@@ -173,7 +173,7 @@ export function LedgerPage() {
               <tbody>
                 {ledgerData.map((entry, index) => (
                   <tr key={index}>
-                    <td>{format(new Date(entry.Date), "d MMM yyyy")}</td>
+                    <td>{format(entry.Date, "d MMM yyyy")}</td>
                     <td>{entry.Notes}</td>
                     <td>{entry.Who}</td>
                     <td className="text-right">{entry.Amount}</td>
