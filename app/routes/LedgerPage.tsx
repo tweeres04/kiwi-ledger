@@ -171,14 +171,19 @@ export function LedgerPage() {
                 </tr>
               </thead>
               <tbody>
-                {ledgerData.map((entry, index) => (
-                  <tr key={index}>
-                    <td>{format(entry.Date, "d MMM yyyy")}</td>
-                    <td>{entry.Notes}</td>
-                    <td>{entry.Who}</td>
-                    <td className="text-right">{entry.Amount}</td>
-                  </tr>
-                ))}
+                {ledgerData
+                  .toSorted(
+                    (a, b) =>
+                      new Date(b.Date).getTime() - new Date(a.Date).getTime()
+                  )
+                  .map((entry, index) => (
+                    <tr key={index}>
+                      <td>{format(entry.Date, "d MMM yyyy")}</td>
+                      <td>{entry.Notes}</td>
+                      <td>{entry.Who}</td>
+                      <td className="text-right">{entry.Amount}</td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
